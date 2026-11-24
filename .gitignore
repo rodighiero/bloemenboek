@@ -1,0 +1,7 @@
+# Full-resolution images and PDFs stay local (PDF is attached to a GitHub Release)
+data/images/
+data/*.pdf
+*.part
+.DS_Store
+__pycache__/
+*.bak

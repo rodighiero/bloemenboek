@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plusieurs Especes de Fleurs — Agnes Block</title>
+<meta name="description" content="Leaf through Agnes Block's flower album 'Plusieurs Especes de Fleurs dessinées d'apres le Naturel' (Rijksmuseum RP-T-1948-119).">
+<link rel="preload" href="fonts/CrimsonPro-Light.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=9">
+</head>
+<body>
+<header class="bar top">
+  <h1><em>Plusieurs Especes de Fleurs</em> <span>Agnes Block, c. 1680–1704</span></h1>
+  <div class="links"><button id="fs" class="link">Full screen</button> <button id="about-open" class="link">About</button></div>
+</header>
+
+<main id="scene" aria-label="Book. Swipe, click a page, or use the arrow keys to turn.">
+  <div id="book" class="book closed">
+    <div class="shadow"></div>
+    <div class="board left"></div>
+    <div class="board right"></div>
+    <div class="stack left"></div>
+    <div class="stack right"></div>
+    <div id="left" class="page left"></div>
+    <div id="right" class="page right"></div>
+  </div>
+</main>
+
+<footer class="bar bottom">
+  <div id="captions" class="captions">
+    <p id="cap-left"></p>
+    <p id="cap-right"></p>
+  </div>
+  <div class="nav">
+    <button id="prev" class="arrow" aria-label="Previous page">‹</button>
+    <input id="scrub" type="range" min="0" value="0" aria-label="Go to page">
+    <button id="next" class="arrow" aria-label="Next page">›</button>
+  </div>
+</footer>
+
+<dialog id="about">
+  <h2><em>Plusieurs Especes de Fleurs dessinées d'apres le Naturel</em></h2>
+  <p>An album of 196 flowers drawn from life, compiled by the collector and gardener
+    Agnes Block (1629–1704). Artists named in it include Maria Moninckx, Pieter Holsteyn II
+    and Octavius M. de J. Brush in colours over pencil. The spine reads
+    <em>Bloemen na't leven gedaen</em>.</p>
+  <p>Rijksmuseum, Amsterdam,
+    <a href="https://www.rijksmuseum.nl/en/collection/RP-T-1948-119">RP-T-1948-119</a>.
+    Images in the <a href="https://creativecommons.org/publicdomain/mark/1.0/">public domain</a>.
+    The handwritten index and the back cover have not been digitised.</p>
+  <p>
+    <a href="https://github.com/rodighiero/bloemenboek/releases/latest/download/Agnes-Block-Bloemen-na-t-leven-gedaen.pdf">PDF (76 MB)</a> ·
+    <a href="https://github.com/rodighiero/bloemenboek">Source</a>
+  </p>
+  <form method="dialog"><button class="link">Close</button></form>
+</dialog>
+
+<script src="app.js?v=9"></script>
+</body>
+</html>
