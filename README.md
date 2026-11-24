@@ -6,12 +6,12 @@ A digital edition you can leaf through of *Plusieurs Especes de Fleurs dessinée
 
 ## The website
 
-A book lying on a sheet of hand-made paper, opened two pages at a time:
+Each drawing is on its own sheet with nothing facing it, so the album is shown one sheet at a time, as a pile of loose sheets lying on hand-made paper:
 
-- turn pages by dragging or swiping, clicking a page, or with the arrow keys (Home/End jump to the start or end); moving the mouse near an outer edge lifts the corner;
-- the turning leaf bends softly, is lit according to its angle, and casts a shadow on the page below;
-- leather boards, page edges that grow and shrink as you read, a shadow that deepens under the spine, and gentle light across each page;
-- page number and title under each page (linking to the Rijksmuseum record), a slider to jump anywhere, and a link per opening (`#12`);
+- drag or swipe the top sheet away to the left to reveal the next one; drag to the right to bring the previous sheet back; tap the right or left half, or use the arrow keys (Home/End jump to the start or end, F toggles full screen);
+- a lifted sheet tips slightly as it moves and casts a wider, softer shadow on the sheet below;
+- the sheets lie slightly askew, their edges peeking out, and the pile gets thinner as you go;
+- sheet number and title under the sheet (linking to the Rijksmuseum record), a slider to jump anywhere, and a link per sheet (`#12`, `#ex-libris`);
 - thumbnails load first; full-size images come from the Rijksmuseum's IIIF server, sized to the screen.
 
 No build step and no dependencies: plain HTML, CSS and JavaScript. To preview locally:

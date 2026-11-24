@@ -21,13 +21,9 @@
   --accent: #3d6b35;
   --shadow-rgb: 70 48 20;
   --paper: #f1e9d8;
-  --paper-edge: #d8ccb3;
   /* set by app.js */
   --pw: 300px;
   --ph: 470px;
-  --shift: 0px;
-  --stack-l: 1px;
-  --stack-r: 8px;
 }
 
 * { box-sizing: border-box; }
@@ -69,6 +65,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 }
 h1 { margin: 0; font-size: 1.05rem; font-weight: 300; }
 h1 span { color: var(--muted); margin-left: .5rem; }
+.links { display: flex; gap: 1.5rem; }
 .link {
   border: 0;
   background: none;
@@ -88,27 +85,20 @@ h1 span { color: var(--muted); margin-left: .5rem; }
   justify-content: flex-start;
   gap: .35rem;
 }
-.captions {
-  width: calc(2 * var(--pw));
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  transform: translateX(var(--shift));
-  transition: transform .2s linear;
-  font-size: .95rem;
-  font-style: italic;
-  color: var(--muted);
-}
-.captions p {
+.caption {
   margin: 0;
-  padding: 0 .75rem;
+  max-width: min(40rem, 90vw);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: .95rem;
+  font-style: italic;
+  color: var(--muted);
 }
-.captions a { color: inherit; text-decoration: none; }
-.captions a:hover { color: var(--ink); }
-.captions b { font-style: normal; font-weight: 300; font-variant-numeric: oldstyle-nums; margin-right: .35em; }
+.caption a { color: inherit; text-decoration: none; }
+.caption a:hover { color: var(--ink); }
+.caption b { font-style: normal; font-weight: 300; font-variant-numeric: oldstyle-nums; margin-right: .35em; }
 
 .nav { display: flex; align-items: center; gap: .75rem; }
 .arrow {
@@ -143,143 +133,89 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 0; }
 
-/* ---------- book ---------- */
+/* ---------- the pile of loose sheets ---------- */
 #scene {
   position: fixed;
   inset: 3.25rem 0 4.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 2600px;
-  perspective-origin: 50% 30%;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
-.book {
-  position: relative;
-  width: calc(2 * var(--pw));
-  height: var(--ph);
-  /* flat on purpose: the pages are drawn in order, the turning leaf has its own 3D space */
-  transform: translateX(var(--shift)) rotateX(5deg);
+.pile {
+  position: absolute;
+  inset: 0;
   cursor: grab;
 }
-.book.dragging { cursor: grabbing; }
+.pile.dragging { cursor: grabbing; }
 
-/* ---------- binding, page block and shadow ---------- */
-:root { --sq: max(3px, calc(var(--pw) * 0.016)); }   /* how far the boards stand out around the pages */
-
-/* Shadow of the whole book on the paper. Light comes from the upper left, so the shadow
-   falls slightly down and right: a dark contact line, then progressively softer layers. */
-.shadow {
+.sheet, .pile-depth {
   position: absolute;
-  top: calc(-1 * var(--sq));
-  bottom: calc(-1 * var(--sq));
-  left: calc(-1 * (var(--stack-l) + var(--sq)));
-  right: calc(-1 * (var(--stack-r) + var(--sq)));
-  border-radius: 5px;
-  box-shadow:
-    0 0 1px 0 rgb(var(--shadow-rgb) / .55),
-    1px 2px 3px rgb(var(--shadow-rgb) / .30),
-    3px 6px 10px rgb(var(--shadow-rgb) / .22),
-    8px 16px 28px rgb(var(--shadow-rgb) / .18),
-    16px 34px 60px rgb(var(--shadow-rgb) / .14),
-    28px 60px 110px rgb(var(--shadow-rgb) / .12);
-  transition: left .35s ease, top .35s ease, bottom .35s ease, right .35s ease;
-}
-/* where the spine presses down, the shadow is deepest */
-.shadow::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -14px;
-  width: 26%;
-  height: 30px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at 50% 0%, rgb(var(--shadow-rgb) / .28), transparent 70%);
-  transition: opacity .35s ease;
-}
-.book.closed .shadow, .book.opening .shadow { left: 50%; }
-.book.closed .shadow { top: 0; bottom: 0; right: 0; }
-.book.closed .shadow::after, .book.opening .shadow::after { opacity: 0; }
-
-/* Leather boards: visible as a thin border around the page block, like a real open book. */
-.board {
-  position: absolute;
-  top: calc(-1 * var(--sq));
-  bottom: calc(-1 * var(--sq));
-  background:
-    linear-gradient(rgb(255 225 190 / .10), transparent 30%, rgb(0 0 0 / .18)),
-    url("thumbs/000_cover.jpg") 50% 45% / 320% auto,
-    #5b3b22;
-  box-shadow:
-    inset 0 0 2px 1px rgb(20 10 0 / .55),          /* rounded, worn board edge */
-    inset 0 1px 0 rgb(255 225 190 / .18);
-  transition: opacity .35s ease;
-}
-.board.left {
-  left: calc(-1 * (var(--stack-l) + var(--sq)));
-  right: 50%;
-  border-radius: 5px 0 0 5px;
-}
-.board.right {
-  left: 50%;
-  right: calc(-1 * (var(--stack-r) + var(--sq)));
-  border-radius: 0 5px 5px 0;
-}
-/* the hinge at the spine */
-.board.left::after, .board.right::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 10px;
-}
-.board.left::after { right: 0; background: linear-gradient(to left, rgb(15 8 0 / .65), transparent); }
-.board.right::after { left: 0; background: linear-gradient(to right, rgb(15 8 0 / .65), transparent); }
-.book.closed .board, .book.opening .board.left { opacity: 0; }
-
-/* fore-edges of the page block, thicker on the side with more pages */
-.stack {
-  position: absolute;
-  top: .35%;
-  bottom: .35%;
-  background:
-    linear-gradient(rgb(var(--shadow-rgb) / .25), transparent 8%, transparent 92%, rgb(var(--shadow-rgb) / .3)),
-    repeating-linear-gradient(90deg, #eee5d1 0 1px, #cdbf9f 1px 2px);
-  transition: opacity .35s ease;
-}
-.stack.left {
-  right: 100%;
-  width: var(--stack-l);
-  border-radius: 2px 0 0 2px;
-  box-shadow: inset 2px 0 2px rgb(var(--shadow-rgb) / .25);
-}
-.stack.right {
-  left: 100%;
-  width: var(--stack-r);
-  border-radius: 0 2px 2px 0;
-  box-shadow: inset -2px 0 2px rgb(var(--shadow-rgb) / .25);
-}
-.book.closed .stack, .book.opening .stack.left { opacity: 0; }
-
-.page {
-  position: absolute;
-  top: 0;
+  left: calc(50% - var(--pw) / 2);
+  top: calc(50% - var(--ph) / 2);
   width: var(--pw);
   height: var(--ph);
+}
+.pile-depth {
+  background: var(--paper);
+  border-radius: 2px;
+  transition: box-shadow .4s ease, opacity .4s ease;
+}
+
+.sheet {
+  --lift: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.sheet.enter { animation: sheet-in .5s ease both; }
+.sheet.leave { opacity: 0; transition: opacity .45s ease; }
+@keyframes sheet-in { from { opacity: 0; } }
+
+/* A sheet lying on the pile: a thin contact shadow (light from the upper left)… */
+.sheet-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  box-shadow:
+    0 0 1px rgb(var(--shadow-rgb) / .40),
+    1px 1px 2px rgb(var(--shadow-rgb) / .20),
+    2px 4px 8px rgb(var(--shadow-rgb) / .12),
+    5px 10px 22px rgb(var(--shadow-rgb) / .08);
+  opacity: calc(1 - var(--lift) * .6);
+}
+/* …and once lifted, a wider, softer shadow that falls further away. */
+.sheet-lift {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  box-shadow:
+    4px 8px 14px rgb(var(--shadow-rgb) / .22),
+    12px 26px 46px rgb(var(--shadow-rgb) / .22),
+    26px 52px 96px rgb(var(--shadow-rgb) / .16);
+  opacity: var(--lift);
+  transform: translate(calc(var(--lift) * 8px), calc(var(--lift) * 16px));
+}
+.sheet.cover .sheet-shadow {
+  /* the cover is a board, thicker than a sheet of paper */
+  box-shadow:
+    0 0 1px rgb(var(--shadow-rgb) / .5),
+    1px 2px 3px rgb(var(--shadow-rgb) / .3),
+    3px 6px 12px rgb(var(--shadow-rgb) / .18),
+    8px 16px 32px rgb(var(--shadow-rgb) / .12);
+}
+
+.paper {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   background: var(--paper);
 }
-.page.left { left: 0; }
-.page.right { left: var(--pw); }
-.page:empty { visibility: hidden; }
+.sheet.cover .paper { border-radius: 3px; }
 
 /* one page image, cropped to hide the photographic margins */
 .pimg {
   position: absolute;
   top: calc(var(--ph) * -0.024);
-  left: calc(var(--pw) * -0.008 - var(--pw) * var(--off, 0) / var(--n, 1));
+  left: calc(var(--pw) * -0.008);
   width: calc(var(--pw) * 1.065);
   height: calc(var(--ph) * 1.052);
   max-width: none;
@@ -289,97 +225,46 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border-radius: 
 }
 .cover .pimg {
   top: calc(var(--ph) * -0.012);
-  left: calc(var(--pw) * -0.02 - var(--pw) * var(--off, 0) / var(--n, 1));
+  left: calc(var(--pw) * -0.02);
   width: calc(var(--pw) * 1.04);
   height: calc(var(--ph) * 1.03);
 }
-.blank { background: var(--paper); }
 
-/* gutter: paper curving into the spine */
-.gutter-r::after, .gutter-l::after {
+/* light from the upper left; a sheet is never perfectly flat */
+.light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgb(255 251 240 / .14), transparent 38%, transparent 62%, rgb(70 48 20 / .09)),
+    radial-gradient(ellipse 90% 70% at 40% 35%, rgb(255 251 240 / .06), transparent 70%);
+}
+.sheet.cover .light { background: linear-gradient(135deg, rgb(255 230 200 / .10), transparent 45%, rgb(0 0 0 / .14)); }
+
+/* ---------- soft edges: each sheet fades into what lies beneath and darkens slightly at its edges ---------- */
+:root {
+  --f: max(2px, calc(var(--pw) * 0.006));      /* width of the fade */
+  --ew: calc(var(--f) * 3);                     /* width of the edge darkening */
+  --edge: rgb(var(--shadow-rgb) / .2);
+  --v: linear-gradient(to bottom, transparent, #000 var(--f), #000 calc(100% - var(--f)), transparent);
+  --h: linear-gradient(to right, transparent, #000 var(--f), #000 calc(100% - var(--f)), transparent);
+}
+.paper {
+  -webkit-mask-image: var(--v), var(--h);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--v), var(--h);
+  mask-composite: intersect;
+}
+.paper::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: none;
-}
-.gutter-r::after {
   background:
-    linear-gradient(to right, rgb(40 25 10 / .42), rgb(40 25 10 / .12) 3%, rgb(255 250 235 / .10) 7%, transparent 16%),
-    linear-gradient(to left, rgb(40 25 10 / .10), transparent 4%);
+    linear-gradient(to bottom, var(--edge), transparent var(--ew), transparent calc(100% - var(--ew)), var(--edge)),
+    linear-gradient(to right, var(--edge), transparent var(--ew), transparent calc(100% - var(--ew)), var(--edge));
 }
-.gutter-l::after {
-  background:
-    linear-gradient(to left, rgb(40 25 10 / .42), rgb(40 25 10 / .12) 3%, rgb(255 250 235 / .10) 7%, transparent 16%),
-    linear-gradient(to right, rgb(40 25 10 / .10), transparent 4%);
-}
-.cover.gutter-r::after { background: linear-gradient(to right, rgb(0 0 0 / .35), transparent 5%); }
-.cover { border-radius: 0 4px 4px 0; }
-
-/* Curvature: each page rises from the spine, catches the light, then falls gently to the
-   fore-edge; light from above makes the top slightly brighter than the bottom.
-   Drawn per page (and per slice of a turning leaf), so it stays continuous while turning. */
-.curve {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--pw);
-  left: calc(-1 * var(--pw) * var(--off, 0) / var(--n, 1));
-  pointer-events: none;
-}
-.curve-r {
-  background:
-    linear-gradient(to right, transparent 0, rgb(255 251 240 / .16) 14%, rgb(255 251 240 / .05) 34%, transparent 55%, rgb(70 48 20 / .06) 82%, rgb(70 48 20 / .14) 100%),
-    linear-gradient(to bottom, rgb(255 251 240 / .08), transparent 35%, transparent 70%, rgb(70 48 20 / .08));
-}
-.curve-l {
-  background:
-    linear-gradient(to left, transparent 0, rgb(255 251 240 / .16) 14%, rgb(255 251 240 / .05) 34%, transparent 55%, rgb(70 48 20 / .06) 82%, rgb(70 48 20 / .14) 100%),
-    linear-gradient(to bottom, rgb(255 251 240 / .08), transparent 35%, transparent 70%, rgb(70 48 20 / .08));
-}
-
-/* dynamic light and cast shadow while turning */
-.shade, .cast {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-}
-.shade { background: rgb(30 18 5); }
-.cast.on-right { background: linear-gradient(to right, rgb(30 18 5 / .55), transparent 70%); }
-.cast.on-left { background: linear-gradient(to left, rgb(30 18 5 / .55), transparent 70%); }
-
-/* the turning leaf, split into slices so it can bend softly */
-.leaf {
-  position: absolute;
-  top: 0;
-  left: var(--pw);
-  width: calc(var(--pw) / var(--n));
-  height: var(--ph);
-  transform-origin: 0 50%;
-  transform-style: preserve-3d;
-}
-.slice {
-  position: absolute;
-  top: 0;
-  left: calc(100% - 1px); /* overlap 1px so the slice seams never show */
-  width: calc(100% + 1px);
-  height: 100%;
-  transform-origin: 0 50%;
-  transform-style: preserve-3d;
-}
-.leaf > .face { position: absolute; }
-.face {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  background: var(--paper);
-}
-.face.back { transform: rotateY(180deg); }
-/* gutter overlays inside slices must span a whole page, not one slice */
-.face.gutter-r::after { width: calc(var(--pw)); right: auto; }
-.face.gutter-l::after { width: calc(var(--pw)); left: auto; }
 
 /* ---------- about ---------- */
 dialog {
@@ -398,52 +283,5 @@ dialog form { text-align: right; }
 
 @media (max-width: 40rem) {
   h1 span { display: none; }
-  .captions { font-size: .85rem; }
+  .caption { font-size: .85rem; }
 }
-
-.face.cover { border-radius: 0; }
-/* slices start 1px early (overlap); keep the front image aligned */
-.slice > .face.front .pimg { margin-left: 1px; }
-
-/* ---------- soft edges ----------
-   Pages fade into the surface and darken slightly toward their edges. The turning leaf
-   uses exactly the same treatment as the flat pages, so nothing changes when a turn ends. */
-:root {
-  --f: max(2px, calc(var(--pw) * 0.006));      /* width of the fade */
-  --ew: calc(var(--f) * 3);                     /* width of the edge darkening */
-  --edge: rgb(var(--shadow-rgb) / .2);
-  --v: linear-gradient(to bottom, transparent, #000 var(--f), #000 calc(100% - var(--f)), transparent);
-  --fade-l: linear-gradient(to right, transparent, #000 var(--f));   /* fade the left edge */
-  --fade-r: linear-gradient(to left, transparent, #000 var(--f));    /* fade the right edge */
-  --dark-v: linear-gradient(to bottom, var(--edge), transparent var(--ew), transparent calc(100% - var(--ew)), var(--edge));
-  --dark-l: linear-gradient(to right, var(--edge), transparent var(--ew));
-  --dark-r: linear-gradient(to left, var(--edge), transparent var(--ew));
-}
-.page, .face {
-  -webkit-mask-image: var(--v);
-  mask-image: var(--v);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
-.page.left,
-.face.back.outer          { -webkit-mask-image: var(--v), var(--fade-l); mask-image: var(--v), var(--fade-l); }
-.page.right,
-.face.front.outer         { -webkit-mask-image: var(--v), var(--fade-r); mask-image: var(--v), var(--fade-r); }
-.page.right.cover         { -webkit-mask-image: var(--v), var(--fade-l), var(--fade-r); mask-image: var(--v), var(--fade-l), var(--fade-r); }
-.face.front.cover.inner   { -webkit-mask-image: var(--v), var(--fade-l); mask-image: var(--v), var(--fade-l); }
-
-.page::before, .face::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: var(--dark-v);
-}
-.page.left::before,  .face.back.outer::before        { background: var(--dark-v), var(--dark-l); }
-.page.right::before, .face.front.outer::before       { background: var(--dark-v), var(--dark-r); }
-.page.right.cover::before                            { background: var(--dark-v), var(--dark-l), var(--dark-r); }
-.face.front.cover.inner::before                      { background: var(--dark-v), var(--dark-l); }
-.page:empty::before { display: none; }
-
-.links { display: flex; gap: 1.5rem; }
